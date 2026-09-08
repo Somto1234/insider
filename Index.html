@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Bet Insider</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
+<style>
+:root{--bg:#06060b;--bg2:#0c0c15;--bg3:#11111d;--bg4:#181826;--t:#e8e8ed;--t2:#a0a0b8;--t3:#5c5c72;--g:#c9a84c;--gl:#e0c460;--gd:#6b4f0e;--gr:#22c55e;--o:#e07b39;--rd:#ef4444;--br:rgba(255,255,255,.025);--bc:rgba(255,255,255,.05);--tr:.3s;--sw:285px}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t);min-height:100vh}
+.app{max-width:100%;margin:0 auto;position:relative}
+.ih{background:linear-gradient(180deg,var(--bg2),var(--bg));padding:20px 16px 12px;text-align:center;position:sticky;top:0;z-index:60;border-bottom:1px solid rgba(201,168,76,.06)}
+.ihr{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.hb{width:40px;height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;z-index:160;border-radius:10px;transition:var(--tr);flex-shrink:0}.hb span{display:block;width:22px;height:2.5px;background:var(--g);border-radius:2px;transition:var(--tr)}.hb.op span:nth-child(1){transform:rotate(45deg)translate(5px,5px)}.hb.op span:nth-child(2){opacity:0}.hb.op span:nth-child(3){transform:rotate(-45deg)translate(5px,-5px)}
+.ihb{display:flex;align-items:center;gap:10px}.ihi{width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:22px}.iht{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--t)}.ihs{font-size:9px;letter-spacing:4px;color:var(--g);text-transform:uppercase;font-weight:600;margin-top:1px}
+.nbell-wrap{position:relative;flex-shrink:0}.nbell{width:38px;height:38px;background:var(--bg3);border:1px solid var(--bc);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--g);cursor:pointer}.nbell .badge{position:absolute;top:-4px;right:-4px;background:var(--rd);color:#fff;border-radius:10px;padding:2px 5px;font-size:8px;font-weight:700;min-width:18px;text-align:center;display:none}.nbell .badge.show{display:block}
+.notif-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);z-index:200;flex-direction:column;padding-top:60px;align-items:center}.notif-overlay.show{display:flex}
+.notif-panel{width:92%;max-width:400px;background:rgba(28,28,35,.95);border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.08);box-shadow:0 20px 60px rgba(0,0,0,.5);animation:slideIn .35s ease}@keyframes slideIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.notif-panel .np-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.06)}.np-header .np-title{font-weight:700;font-size:15px;color:var(--t)}.np-header .np-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:12px}.np-list{max-height:400px;overflow-y:auto;padding:6px 0}
+.np-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.02)}.np-item .np-icon{width:40px;height:40px;border-radius:10px;background:rgba(201,168,76,.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}.np-item .np-icon.new{background:rgba(201,168,76,.2)}.np-item .np-content{flex:1;min-width:0}.np-item .np-app{font-weight:600;font-size:11px;color:var(--t);margin-bottom:2px}.np-item .np-body{font-size:10px;color:var(--t2);line-height:1.4}.np-item .np-time{font-size:9px;color:var(--t3);margin-top:3px}.np-item .np-dot{width:8px;height:8px;border-radius:50%;background:var(--rd);flex-shrink:0;margin-top:6px}.np-item .np-dot.read{background:transparent}.np-empty{padding:30px 20px;text-align:center;color:var(--t3);font-size:11px}.np-empty i{font-size:30px;margin-bottom:8px;display:block;opacity:.3}.np-mark{text-align:right;padding:8px 16px;font-size:9px;color:var(--g);cursor:pointer;font-weight:600}
+.ip-banner{position:fixed;top:10px;left:50%;transform:translateX(-50%)translateY(-120px);width:94%;max-width:420px;background:rgba(28,28,35,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:14px;padding:12px 14px;z-index:9999;display:flex;align-items:center;gap:12px;border:1px solid rgba(255,255,255,.08);box-shadow:0 10px 40px rgba(0,0,0,.5);cursor:pointer;transition:transform .4s cubic-bezier(.22,.61,.36,1)}.ip-banner.show{transform:translateX(-50%)translateY(0)}.ip-banner .ip-icon{width:40px;height:40px;border-radius:10px;background:rgba(201,168,76,.15);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}.ip-banner .ip-content{flex:1;min-width:0}.ip-banner .ip-app{font-weight:600;font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}.ip-banner .ip-title{font-weight:600;font-size:12px;color:var(--t)}.ip-banner .ip-body{font-size:10px;color:var(--t2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.so{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.75);z-index:110;opacity:0;pointer-events:none;transition:.35s}.so.op{opacity:1;pointer-events:auto}
+.sd{position:fixed;top:0;left:0;width:var(--sw);height:100%;background:linear-gradient(180deg,#0c0c15,#08080f);z-index:120;transform:translateX(-100%);transition:.35s;display:flex;flex-direction:column;overflow-y:auto;border-right:1px solid rgba(201,168,76,.06)}.sd.op{transform:translateX(0)}
+.sl{padding:24px 20px 14px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:12px}.sli{width:44px;height:44px;background:linear-gradient(135deg,var(--g),var(--gd));border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;color:#06060b}.slt{font-family:'Cormorant Garamond',serif;font-weight:700;font-size:19px;color:var(--t);line-height:1.1}.slt small{display:block;font-size:8px;letter-spacing:3px;color:var(--g)}
+.sn{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:2px}.si{display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:13px;cursor:pointer;color:var(--t2);font-weight:500;font-size:13px;transition:var(--tr);text-decoration:none}.si:hover,.si.ac{background:rgba(201,168,76,.07);color:var(--g)}.svi{width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:17px}.ssp{margin:6px 14px;height:1px;background:linear-gradient(90deg,transparent,var(--g),transparent);opacity:.3}
+.svp{display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:13px;cursor:pointer;color:var(--gl);font-weight:600;font-size:13px;background:rgba(201,168,76,.05);border:1px solid rgba(201,168,76,.12);transition:var(--tr);text-decoration:none}.svp:hover{background:rgba(201,168,76,.13)}.svp .svi{font-size:19px}
+.ct{padding:16px;max-width:500px;margin:0 auto}
+.wa-hero{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#075e54,#128c7e);border:1px solid rgba(37,211,102,.3);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer}.wa-hero .wa-icon{font-size:32px;color:#25D366;background:#fff;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center}.wa-hero .wa-info{flex:1}.wa-hero .wa-title{font-weight:700;font-size:13px;color:#fff}.wa-hero .wa-sub{font-size:9px;color:rgba(255,255,255,.7);margin-top:2px}.wa-hero .wa-arrow{color:#25D366;font-size:20px}
+.aff-banner{margin:0 0 10px;padding:14px;background:linear-gradient(135deg,#1a0a0a,#0f0f1a);border:1.5px solid rgba(201,168,76,.25);border-radius:14px;text-align:center;cursor:pointer}.aff-banner .aff-sponsor{font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}.aff-banner .aff-title{font-weight:800;font-size:13px;color:#fff}.aff-banner .aff-sub{font-size:8px;color:var(--gl);margin:3px 0}.aff-banner .aff-btn{background:linear-gradient(135deg,#e0c460,#c9a84c);color:#000;padding:6px 14px;border-radius:18px;font-weight:700;font-size:9px;display:inline-block;margin-top:5px}
+.ad-banner{margin:0 0 10px;padding:12px;background:var(--bg3);border:1px solid var(--br);border-radius:10px;text-align:center;cursor:pointer}.ad-banner .ad-label{font-size:7px;color:var(--t3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}.ad-banner .ad-content{font-size:10px;color:var(--t2)}
+.af{display:flex;justify-content:flex-end;padding:0 0 8px}.ac{display:inline-flex;align-items:center;gap:7px;background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.2);padding:7px 14px;border-radius:20px;font-size:10px;color:var(--t2)}.ac .vl{font-size:15px;font-weight:700;color:var(--gl)}
+.ch{padding:0 0 10px}.ctt{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--t);line-height:1.1}.ctt span{display:block;font-size:9px;letter-spacing:2px;color:var(--g);text-transform:uppercase;margin-top:2px}
+.ma{display:flex;flex-direction:column;gap:14px;padding:0 0 12px}
+.mc{background:linear-gradient(160deg,#0f0f1a,#0a0a12);border:1.5px solid rgba(255,255,255,.04);border-radius:16px;padding:20px 18px;position:relative;transition:var(--tr);box-shadow:0 6px 22px rgba(0,0,0,.5)}.mc.today{border-left:3px solid var(--g)}.mc.past{border-left:3px solid var(--t3);opacity:.7}
+.mcg{position:absolute;top:12px;right:14px;width:8px;height:8px;background:var(--g);border-radius:50%;box-shadow:0 0 14px rgba(201,168,76,.5);animation:pl 2.2s infinite}@keyframes pl{0%,100%{opacity:.5}50%{opacity:1}}
+.mch{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.mcl{font-weight:700;font-size:13px;color:var(--t);display:flex;align-items:center;gap:7px;text-transform:uppercase}.mcl .fl{font-size:18px}.mcd{font-size:9px;color:var(--gl);font-weight:600;background:rgba(201,168,76,.1);padding:3px 8px;border-radius:6px}.mctt{font-size:10px;color:var(--t3);font-weight:600}.mctt i{margin-right:4px;color:var(--g)}
+.mtm{display:flex;align-items:center;justify-content:center;margin-bottom:14px;gap:20px}.mt{font-weight:800;font-size:16px;color:var(--t);text-transform:uppercase}.mv{font-size:9px;color:var(--gl);font-weight:700;background:rgba(201,168,76,.06);padding:8px 14px;border-radius:12px;display:flex;align-items:center;gap:5px;border:1px solid rgba(201,168,76,.12)}
+.mcf{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}.tt{display:inline-flex;align-items:center;gap:6px;background:rgba(139,94,60,.2);color:var(--gl);padding:8px 14px;border-radius:14px;font-weight:700;font-size:12px;border:1px solid rgba(139,94,60,.25)}.ob{background:linear-gradient(135deg,var(--o),#b85a22);color:#fff;padding:10px 22px;border-radius:20px;font-weight:800;font-size:15px;cursor:pointer;border:none;transition:var(--tr);box-shadow:0 4px 14px rgba(224,123,57,.3);text-transform:uppercase}
+.meta-row{display:flex;align-items:center;gap:12px;margin-top:12px;flex-wrap:wrap}
+.meta-item{font-size:11px;color:#fff;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);padding:6px 12px;border-radius:8px;font-weight:600}.meta-item i{font-size:14px}
+.meta-item.win{background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.3)}.meta-item.loss{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}.meta-item.goal{background:rgba(201,168,76,.15);color:#e0c460;border:1px solid rgba(201,168,76,.3)}
+.vp{display:none;padding:16px;text-align:center;max-width:500px;margin:0 auto}.vp.ac{display:block}
+.vph{display:flex;align-items:center;justify-content:center;gap:8px;padding-top:10px}.vpc{font-size:26px}.vpt{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--gl)}.vps{font-size:10px;color:var(--t3);margin-bottom:16px}
+.uw{display:flex;flex-direction:column;align-items:center;gap:10px;max-width:280px;margin:0 auto 6px}.ui{width:100%;background:rgba(255,255,255,.03);border:1.5px solid rgba(201,168,76,.3);color:var(--t);padding:13px 16px;border-radius:22px;font-size:12px;text-align:center;outline:none;transition:var(--tr);font-family:'Inter',sans-serif;letter-spacing:2px;pointer-events:auto;-webkit-user-select:text;user-select:text}.ui:focus{border-color:var(--g)}.ui::placeholder{color:var(--t3);letter-spacing:1px;font-size:10px}
+.ub{width:100%;background:linear-gradient(135deg,var(--g),var(--gd));color:#06060b;padding:13px 18px;border-radius:22px;font-weight:700;font-size:12px;cursor:pointer;border:none;transition:var(--tr);text-transform:uppercase;box-shadow:0 4px 12px rgba(201,168,76,.22);pointer-events:auto;z-index:99}
+.ue{color:#e74c3c;font-size:9px;margin-top:4px;display:none}.ue.sh{display:block}
+.vrc{display:none;padding:0}.vrc.sh{display:block}
+.vmc{background:linear-gradient(160deg,#1a1000,#0f0f1a);border:1.5px solid rgba(201,168,76,.15);border-radius:16px;padding:20px 18px;margin-bottom:14px;position:relative;transition:var(--tr);box-shadow:0 0 20px rgba(201,168,76,.05),0 6px 22px rgba(0,0,0,.5);text-align:left}.vmc.today{border-left:3px solid var(--gl)}.vmc.past{border-left:3px solid var(--t3);opacity:.7}.vmc:hover{transform:translateY(-2px)}
+.vmc .vip-badge{position:absolute;top:-10px;left:16px;background:linear-gradient(135deg,var(--gl),var(--gd));color:#000;padding:4px 10px;border-radius:8px;font-size:8px;font-weight:800;letter-spacing:1px;text-transform:uppercase;animation:vipGlow 2s infinite;z-index:2}@keyframes vipGlow{0%,100%{box-shadow:0 0 8px rgba(224,196,96,.4)}50%{box-shadow:0 0 18px rgba(224,196,96,.8)}}
+.vmc .vmcg{position:absolute;top:12px;right:14px;width:8px;height:8px;background:var(--gl);border-radius:50%;box-shadow:0 0 14px rgba(224,196,96,.5);animation:pl 2.2s infinite}
+.vmc .vch{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;margin-top:6px}.vmc .vcl{font-weight:700;font-size:13px;color:var(--t);display:flex;align-items:center;gap:7px;text-transform:uppercase}.vmc .vcl .fl{font-size:18px}.vmc .vcd{font-size:9px;color:var(--gl);font-weight:600;background:rgba(201,168,76,.1);padding:3px 8px;border-radius:6px}.vmc .vct{font-size:10px;color:var(--t3);font-weight:600}.vmc .vct i{margin-right:4px;color:var(--g)}
+.vmc .vtm{display:flex;align-items:center;justify-content:center;margin-bottom:14px;gap:20px}.vmc .vtm .mt{font-weight:800;font-size:16px;color:var(--t);text-transform:uppercase}.vmc .vtm .mv{font-size:9px;color:var(--gl);font-weight:700;background:rgba(201,168,76,.08);padding:8px 14px;border-radius:12px;display:flex;align-items:center;gap:5px;border:1px solid rgba(201,168,76,.2)}
+.vmc .vmb{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}.vmc .vtr{background:rgba(201,168,76,.18);color:var(--gl);padding:8px 14px;border-radius:14px;font-weight:700;font-size:11px;border:1px solid rgba(201,168,76,.25)}.vmc .vto{font-weight:800;font-size:15px;color:var(--gl)}
+.vlw.hd{display:none}
+.ft{padding:14px 16px;text-align:center;border-top:1px solid var(--br);margin-top:10px}.ft p{font-size:8px;color:var(--t3);line-height:1.7}.ft p strong{color:var(--t2)}
+.sec-divider{text-align:center;padding:8px 0;margin:8px 0;color:var(--t3);font-size:9px;text-transform:uppercase;letter-spacing:2px;border-top:1px solid var(--br);border-bottom:1px solid var(--br)}.sec-divider span{color:var(--g)}
+
+.vip-gate,.vip-status,.vip-manual,.vip-plan{background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.15);border-radius:14px;padding:14px;margin:10px 0}.vip-note,.vip-user{font-size:10px;color:var(--t2);margin-top:8px}.vip-plan{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.vip-plan small{display:block;color:var(--t3);font-size:9px;margin-top:3px}.vip-plan b{color:var(--gl)}.vip-plan .plan-btn,.vip-plan .manual-btn{grid-column:span 1}.vip-active{color:#22c55e;font-size:11px}.vip-inactive{color:var(--t2);font-size:10px}.vip-manual{display:flex;flex-direction:column;gap:8px}.vip-manual h4{color:var(--gl);font-size:12px}.vip-code-row{display:flex;gap:8px;align-items:center;margin-top:10px}.vip-code-row span{flex:1;padding:10px;background:#090910;border-radius:9px;color:var(--gl);font-weight:800;letter-spacing:2px}.vip-code-row .ub{width:auto;padding:10px}.vip-plan .ub{width:auto;padding:9px;font-size:9px}
+.google-signin{width:100%;min-height:52px;background:#fff;color:#202124;border:1px solid #dadce0;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:12px;font-family:Arial,sans-serif;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.15);transition:transform .18s ease,box-shadow .18s ease,background .18s ease}.google-signin:hover{background:#f8f9fa;box-shadow:0 2px 6px rgba(0,0,0,.2);transform:translateY(-1px)}.google-signin:active{transform:translateY(0)}.google-signin:disabled{opacity:.65;cursor:wait;transform:none}.google-logo{width:20px;height:20px;display:block}.google-helper{font-size:10px;color:var(--t2);text-align:center;margin-top:9px}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="ih"><div class="ihr"><div class="hb" id="hb" onclick="ts()"><span></span><span></span><span></span></div><div class="ihb"><span class="ihi">👑</span><span class="iht" id="siteTitle">Bet Insider</span><span class="ihi bl">⚽</span></div><div class="nbell-wrap"><div class="nbell" id="notifBell" onclick="toggleNotifDropdown()"><i class="fa-solid fa-bell"></i><span class="badge" id="notifBadge">0</span></div></div></div><div class="ihs" id="siteTagline">PREMIUM TIPS</div></header>
+<div class="so" id="so" onclick="ts()"></div>
+<aside class="sd" id="sd"><div class="sl"><div class="sli">VIP</div><div class="slt">Bet<br><small>Insider</small></div></div><nav class="sn"><a href="#" class="si ac" onclick="sf();ts()"><span class="svi">🏆</span>FREE TIPS</a><a href="#" class="svp" onclick="sv();ts()"><span class="svi">👑</span>VVIP TIPS</a><a href="#" class="si" onclick="openLink('odds200')"><span class="svi">💎</span>200+ ODDS</a><div class="ssp"></div><a href="#" class="si" onclick="openLink('updateApp')"><span class="svi">🔄</span>UPDATE APP</a><a href="#" class="si" onclick="openLink('privacy')"><span class="svi">🛡️</span>Privacy Policy</a></nav></aside>
+<div class="ct"><div id="fs">
+<div class="wa-hero" onclick="openWA()"><div class="wa-icon"><i class="fa-brands fa-whatsapp"></i></div><div class="wa-info"><div class="wa-title">Get VIP Pass-Key 🔐</div><div class="wa-sub">Message us on WhatsApp for premium access</div></div><div class="wa-arrow"><i class="fa-solid fa-chevron-right"></i></div></div>
+<div class="aff-banner" onclick="openAffLink()"><div class="aff-sponsor">Sponsored</div><div class="aff-title">🎰 BET ON 1XBET TODAY!</div><div class="aff-sub">Get 300% Welcome Bonus · Instant Withdrawal</div><div class="aff-btn">CLAIM BONUS →</div></div>
+<div class="ad-banner" onclick="openAffLink()"><div class="ad-label">Advertisement</div><div class="ad-content">🔥 Hot Odds Available Now! Tap to see more →</div></div>
+<div class="af"><div class="ac">TOTAL ODDS<span class="vl" id="totalOdds"></span></div></div>
+<div class="ch"><div class="ctt">FREE TIPS<br><span>Todays game 75% Sure</span></div></div>
+<div class="ma" id="freeMatches"></div>
+<div class="ft"><p id="siteFooter"><strong>Responsible Gambling (18+ only)</strong> | Bet Insider is not a bookmaker | Results are not guaranteed<br>Please gamble responsibly.</p><p style="margin-top:6px">© 2026 Bet Insider. All rights reserved.</p></div></div>
+<div id="vp" class="vp"><div class="vph"><span class="vpc">👑</span><span class="vpt">VVIP TIPS</span></div><p class="vps">Premium selections for active members</p><div id="vipAuthGate" class="vip-gate"><button class="google-signin" id="googleBtn" type="button" aria-label="Sign in with Google"><svg class="google-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.27c0-.72-.06-1.42-.18-2.09H12v3.95h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.7 2.91-4.2 2.91-7.25z"/><path fill="#34A853" d="M12 21.99c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.55 0-4.71-1.72-5.49-4.03H3.26v2.53A9.75 9.75 0 0 0 12 21.99z"/><path fill="#FBBC05" d="M6.51 14.07A5.86 5.86 0 0 1 6.2 12c0-.72.12-1.42.31-2.07V7.4H3.26A9.99 9.99 0 0 0 2.25 12c0 1.61.39 3.13 1.01 4.6l3.25-2.53z"/><path fill="#EA4335" d="M12 5.9c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.83 2.95 14.63 2 12 2a9.75 9.75 0 0 0-8.74 5.4l3.25 2.53C7.29 7.62 9.45 5.9 12 5.9z"/></svg><span>Sign in with Google</span></button><p class="vip-note">Use your Google account to view plans and manage your VIP access.</p><p class="google-helper">Secure sign-in with Google</p></div><div id="vipPlans" class="vip-plans" style="display:none"></div><div id="vipPayment" style="display:none"></div><div id="vipLocked" style="display:none"><div class="uw"><input type="text" class="ui" id="vipInput" placeholder="Activation Code" maxlength="40" autocomplete="off"><button class="ub" id="vipBtn">ACTIVATE VIP</button><span class="ue" id="vipError">Invalid activation code.</span></div></div><div id="vipStatus" class="vip-status" style="display:none"></div><div class="vrc" id="vipUnlocked" style="display:none"></div></div></div>
+</div>
+<div class="notif-overlay" id="notifOverlay" onclick="if(event.target===this)closeNotifPanel()"><div class="notif-panel"><div class="np-header"><span class="np-title">Notifications</span><span class="np-close" onclick="closeNotifPanel()">✕</span></div><div class="np-mark" onclick="markAllRead()">Mark All Read</div><div class="np-list" id="npList"></div></div></div>
+
+<script>
+// ---------- FIREBASE CONFIGURATION ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyBH02GdlHfAA4LNsxbBisZdFcB9NM6r5LI",
+  authDomain: "bet-insider-pro.firebaseapp.com",
+  projectId: "bet-insider-pro",
+  storageBucket: "bet-insider-pro.firebasestorage.app",
+  messagingSenderId: "173152532136",
+  appId: "1:173152532136:web:dc64e4db6c04daf02ff49d",
+  measurementId: "G-LQPBG9EN1V"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const DR = db.collection('public').doc('main');
+const auth = firebase.auth();
+const functionsBase = window.location.origin;
+let currentUser = null;
+let currentSubscription = null;
+
+// ---------- APP DATA (no localStorage) ----------
+let appData = {
+  m: [], vc: [], st: { tl: 'Bet Insider', tg: 'PREMIUM TIPS', to: '2.17', ft: 'Responsible Gambling (18+ only) | Bet Insider is not a bookmaker | Results are not guaranteed.' },
+  ul: [], bc: [], lk: {}, timedCodes: []
+};
+
+// Helper: show temporary toast message
+function showToast(msg, isError = false) {
+  let toast = document.createElement('div');
+  toast.textContent = msg;
+  toast.style.position = 'fixed';
+  toast.style.bottom = '20px';
+  toast.style.left = '50%';
+  toast.style.transform = 'translateX(-50%)';
+  toast.style.background = isError ? '#ef4444' : '#c9a84c';
+  toast.style.color = isError ? '#fff' : '#000';
+  toast.style.padding = '8px 16px';
+  toast.style.borderRadius = '20px';
+  toast.style.fontSize = '11px';
+  toast.style.fontWeight = 'bold';
+  toast.style.zIndex = '9999';
+  toast.style.whiteSpace = 'nowrap';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
+// Save entire appData to Firestore (admin & user panels share this)
+async function saveData() {
+  try {
+    await DR.set(appData);
+    console.log('✅ Data saved to Firestore');
+    return true;
+  } catch(e) {
+    console.error('Firestore write error:', e);
+    showToast('⚠️ Could not save to cloud', true);
+    return false;
+  }
+}
+
+// ---------- REAL-TIME SYNC (user panel updates instantly when admin changes anything) ----------
+let isFirstSync = true;
+DR.onSnapshot(snapshot => {
+  if (snapshot.exists) {
+    const fresh = snapshot.data();
+    // Merge to keep local structure
+    appData = fresh;
+    if (!appData.m) appData.m = [];
+    if (!appData.vc) appData.vc = [];
+    if (!appData.st) appData.st = {};
+    if (!appData.ul) appData.ul = [];
+    if (!appData.bc) appData.bc = [];
+    if (!appData.lk) appData.lk = {};
+    if (!appData.timedCodes) appData.timedCodes = [];
+    // Refresh UI
+    LFT();
+    LSS();
+    renderNotifPanel();
+    updateBadge();
+    if (!isFirstSync) {
+      showToast('🔄 New updates available');
+    }
+    isFirstSync = false;
+  } else {
+    // Normal users must never attempt to create/write the public document.
+    // The admin panel publishes this document when content is saved.
+    if (isFirstSync) {
+      LFT(); LSS(); updateBadge();
+      isFirstSync = false;
+    }
+  }
+}, error => {
+  console.error('Firestore realtime error:', error);
+  const code = error && error.code ? ` (${error.code})` : '';
+  if (error && error.code === 'permission-denied') {
+    showToast('⚠️ Firebase access denied. Check Firestore rules.', true);
+  } else {
+    showToast(`⚠️ Real-time connection problem${code}.`, true);
+  }
+});
+
+// ---------- HELPER & UI FUNCTIONS ----------
+function ts(){ document.getElementById('sd').classList.toggle('op'); document.getElementById('so').classList.toggle('op'); document.getElementById('hb').classList.toggle('op'); }
+function sv(){ document.getElementById('fs').style.display='none'; document.getElementById('vp').classList.add('ac'); document.querySelectorAll('.si').forEach(i=>i.classList.remove('ac')); document.querySelector('.svp').style.background='rgba(201,168,76,.13)'; }
+function sf(){ document.getElementById('fs').style.display='block'; document.getElementById('vp').classList.remove('ac'); document.querySelectorAll('.si').forEach(i=>i.classList.remove('ac')); document.querySelector('.si').classList.add('ac'); document.querySelector('.svp').style.background='rgba(201,168,76,.05)'; }
+function openLink(type){ const url = appData.lk[type] || ''; if(url) window.open(url,'_blank'); else showToast('Link not configured', true); }
+function openWA(){ const url = appData.lk.whatsapp || ''; if(url) window.open(url,'_blank'); else showToast('WhatsApp link missing', true); }
+function openAffLink(){ const url = appData.lk.affiliate || ''; if(url) window.open(url,'_blank'); else showToast('Affiliate link missing', true); }
+
+function buildCard(m, today){
+  const cls = today ? 'mc today' : 'mc past';
+  const dLabel = today ? '📅 TODAY' : (m.dt || '');
+  const w = m.result === 'win' ? '<span class="meta-item win"><i class="fa-solid fa-trophy"></i> WIN</span>' : '';
+  const l = m.result === 'loss' ? '<span class="meta-item loss"><i class="fa-solid fa-xmark"></i> LOSS</span>' : '';
+  const g = m.goals ? `<span class="meta-item goal"><i class="fa-solid fa-futbol"></i> ${m.goals} goals</span>` : '';
+  return `<div class="${cls}"><div class="mcg"></div><div class="mch"><div class="mcl"><span class="fl">${m.fl}</span>${m.lg}</div><span class="mcd">${dLabel}</span></div><div class="mctt"><i class="fa-regular fa-clock"></i> ${m.tm}</div><div class="mtm"><span class="mt">${m.t1}</span><span class="mv"><i class="fa-solid fa-bolt"></i> VS</span><span class="mt">${m.t2}</span></div><div class="mcf"><span class="tt">TIP: ${m.tp} 🔥🔥</span><button class="ob">${m.od}</button></div>${(w||l||g)?`<div class="meta-row">${w}${l}${g}</div>`:''}</div>`;
+}
+function LFT(){
+  const c = document.getElementById('freeMatches');
+  if(!c) return;
+  const today = new Date().toISOString().split('T')[0];
+  const todayM = appData.m.filter(m => m.ty === 'free' && m.ac && m.dt === today).reverse();
+  const pastM = appData.m.filter(m => m.ty === 'free' && m.ac && m.dt !== today).reverse();
+  let h = '';
+  todayM.forEach(m => { h += buildCard(m, true); });
+  if(pastM.length){
+    h += '<div class="sec-divider">📜 <span>BET HISTORY</span></div>';
+    pastM.forEach(m => { h += buildCard(m, false); });
+  }
+  c.innerHTML = h || '<p style="text-align:center;color:#5c5c72;padding:20px">No tips available</p>';
+}
+function LSS(){
+  const s = appData.st || {};
+  document.getElementById('siteTitle').textContent = s.tl || 'Bet Insider';
+  document.getElementById('siteTagline').textContent = s.tg || 'PREMIUM TIPS';
+  document.getElementById('totalOdds').textContent = s.to || '';
+  const fe = document.getElementById('siteFooter');
+  if(fe && s.ft) fe.innerHTML = '<strong>'+s.ft+'</strong>';
+}
+
+function buildVIPCard(m, today){
+  const cls = today ? 'vmc today' : 'vmc past';
+  const dLabel = today ? '📅 TODAY' : (m.dt || '');
+  const w = m.result === 'win' ? '<span class="meta-item win"><i class="fa-solid fa-trophy"></i> WIN</span>' : '';
+  const l = m.result === 'loss' ? '<span class="meta-item loss"><i class="fa-solid fa-xmark"></i> LOSS</span>' : '';
+  const g = m.goals ? `<span class="meta-item goal"><i class="fa-solid fa-futbol"></i> ${m.goals} goals</span>` : '';
+  return `<div class="${cls}"><div class="vip-badge">👑 VIP</div><div class="vmcg"></div><div class="vch"><div class="vcl"><span class="fl">${m.fl}</span>${m.lg}</div><span class="vcd">${dLabel}</span></div><div class="vct"><i class="fa-regular fa-clock"></i> ${m.tm}</div><div class="vtm"><span class="mt">${m.t1}</span><span class="mv"><i class="fa-solid fa-bolt"></i> VS</span><span class="mt">${m.t2}</span></div><div class="vmb"><span class="vtr">TIP: ${m.tp} 🔥🔥</span><span class="vto">${m.od}</span></div>${(w||l||g)?`<div class="meta-row">${w}${l}${g}</div>`:''}</div>`;
+}
+
+// ---------- GOOGLE AUTH + VIP MEMBERSHIP ----------
+const googleProvider = new firebase.auth.GoogleAuthProvider();
+async function signInGoogle(){
+  const btn = document.getElementById('googleBtn');
+  if(btn){ btn.disabled = true; const label=btn.querySelector('span'); if(label) label.textContent='Opening Google...'; }
+  try {
+    googleProvider.setCustomParameters({ prompt: 'select_account' });
+    // Use Firebase's real OAuth redirect flow. This works better than popups in VS Code/embedded browsers.
+    await auth.signInWithRedirect(googleProvider);
+  } catch(e) {
+    console.error('Google sign-in error:', e);
+    let msg='Google sign-in could not start.';
+    if(e && e.code==='auth/operation-not-allowed') msg='Google Sign-In is not enabled in Firebase Authentication.';
+    else if(e && e.code==='auth/unauthorized-domain') msg='This website domain is not authorized in Firebase Authentication.';
+    else if(e && e.code==='auth/invalid-api-key') msg='The Firebase web configuration is invalid.';
+    showToast(msg,true);
+    if(btn){ btn.disabled=false; const label=btn.querySelector('span'); if(label) label.textContent='Sign in with Google'; }
+  }
+}
+
+async function handleGoogleRedirect(){
+  try {
+    const result=await auth.getRedirectResult();
+    if(result && result.user) showToast('Google sign-in successful');
+  } catch(e){
+    console.error('Google redirect result error:',e);
+    let msg='Google sign-in failed.';
+    if(e && e.code==='auth/unauthorized-domain') msg='This website domain is not authorized in Firebase Authentication.';
+    else if(e && e.code==='auth/operation-not-allowed') msg='Google Sign-In is not enabled in Firebase Authentication.';
+    else if(e && e.code==='auth/invalid-api-key') msg='The Firebase web configuration is invalid.';
+    showToast(msg,true);
+  }
+}
+async function callFunction(name, data={}){
+  const fn = firebase.functions ? firebase.functions().httpsCallable(name) : null;
+  if(!fn) throw new Error('Firebase Functions SDK is missing.');
+  return (await fn(data)).data;
+}
+async function loadPlans(){
+  const wrap=document.getElementById('vipPlans'); if(!wrap || !currentUser) return;
+  try{
+    let snap;
+    try {
+      snap = await db.collection('plans').where('active','==',true).orderBy('sort','asc').get();
+    } catch(indexError) {
+      // Keep the site usable if the composite index has not been deployed yet.
+      console.warn('Plans index unavailable; using fallback query.', indexError);
+      snap = await db.collection('plans').where('active','==',true).get();
+    }
+    if(snap.empty){ wrap.innerHTML='<p style="color:#a0a0b8;text-align:center">VIP plans are not available yet.</p>'; return; }
+    const plans = snap.docs.map(d=>({id:d.id, ...d.data()})).sort((a,b)=>(Number(a.sort)||999)-(Number(b.sort)||999));
+    wrap.innerHTML='<h4 style="color:#e0c460;margin:8px 0 10px">CHOOSE YOUR PLAN</h4>'+plans.map(p=>`<div class="vip-plan"><div><strong>${p.name}</strong><small>${p.durationDays} days</small></div><b>₦${Number(p.price).toLocaleString()}</b><button class="ub plan-btn" onclick="startPayment('${p.id}')">PAY NOW</button><button class="ub manual-btn" onclick="showManual('${p.id}')">MANUAL</button></div>`).join('');
+  }catch(e){ console.error('Could not load plans:', e); wrap.innerHTML='<p style="color:#ef4444">Could not load plans. Please try again.</p>'; }
+}
+async function refreshSubscription(){
+  if(!currentUser) return;
+  try{
+    const snap=await db.collection('subscriptions').doc(currentUser.uid).get();
+    currentSubscription=snap.exists?snap.data():null;
+    const active=currentSubscription && currentSubscription.status==='active' && currentSubscription.expiresAt && currentSubscription.expiresAt.toMillis()>Date.now();
+    document.getElementById('vipPlans').style.display=active?'none':'block';
+    document.getElementById('vipLocked').style.display=active?'none':'block';
+    const st=document.getElementById('vipStatus'); st.style.display='block';
+    if(active){ st.innerHTML=`<div class="vip-active">✅ VIP ACTIVE — ${currentSubscription.planName}<br><small>Expires ${currentSubscription.expiresAt.toDate().toLocaleString()}</small></div>`; await loadVipContent(); }
+    else { st.innerHTML='<div class="vip-inactive">VIP access is locked. Choose a plan or enter your activation code.</div>'; loadPlans(); }
+  }catch(e){ console.error(e); }
+}
+async function startPayment(planId){
+  try{
+    const result=await callFunction('initializePayment',{planId});
+    if(result.authorization_url) window.location.href=result.authorization_url;
+  }catch(e){ showToast(e.message || 'Payment could not be started.',true); }
+}
+async function verifyReturnedPayment(){
+  const params=new URLSearchParams(location.search); const ref=params.get('reference')||params.get('trxref');
+  if(!ref || !currentUser) return;
+  try{
+    const r=await callFunction('verifyPaystackPayment',{reference:ref});
+    if(r.ok && r.code){ showActivationResult(r.code); }
+    else if(!r.ok) showToast('Payment is still being verified.',true);
+    history.replaceState({},'',location.pathname);
+    await refreshSubscription();
+  }catch(e){ showToast(e.message || 'Payment verification failed.',true); }
+}
+function showActivationResult(code){
+  const st=document.getElementById('vipStatus'); st.style.display='block';
+  st.innerHTML=`<div class="vip-active">✅ PAYMENT SUCCESSFUL<br><small>Your activation code:</small><strong style="display:block;font-size:18px;letter-spacing:2px;margin:7px 0">${code}</strong><button class="ub" onclick="navigator.clipboard.writeText('${code}');showToast('Code copied!')">COPY ACTIVATION CODE</button></div>`;
+}
+function showManual(planId){
+  const p=document.getElementById('vipPayment'); p.style.display='block';
+  p.innerHTML=`<div class="vip-manual"><h4>MANUAL PAYMENT</h4><div id="manualInstructions">Loading payment instructions...</div><input class="ui" id="manualRef" placeholder="Payment reference"><input class="ui" id="manualProof" type="file" accept="image/*"><button class="ub" onclick="submitManual('${planId}')">SUBMIT PAYMENT PROOF</button></div>`;
+  db.collection('manualPaymentSettings').doc('main').get().then(s=>{const d=s.exists?s.data():{};document.getElementById('manualInstructions').innerHTML=`<p>${d.bankName||'Bank details not configured'}<br>${d.accountName||''}<br><strong>${d.accountNumber||''}</strong><br>Amount: ₦${Number(d.amount||0).toLocaleString()} ${d.note||''}</p>`});
+}
+async function submitManual(planId){
+  const file=document.getElementById('manualProof').files[0], ref=document.getElementById('manualRef').value.trim();
+  if(!file||!ref) return showToast('Add proof and payment reference.',true);
+  try{
+    const path=`manualProofs/${currentUser.uid}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+    const task=await firebase.storage().ref(path).put(file,{contentType:file.type});
+    const url=await task.ref.getDownloadURL();
+    await callFunction('submitManualPayment',{planId,reference:ref,proofPath:path});
+    showToast('Payment proof submitted for review.'); document.getElementById('vipPayment').innerHTML='<div class="vip-active">⏳ PAYMENT UNDER REVIEW</div>';
+  }catch(e){showToast(e.message||'Could not submit proof.',true);}
+}
+async function activateCode(){
+  const input=document.getElementById('vipInput'), code=input.value.trim().toUpperCase(); if(!code)return;
+  try{const r=await callFunction('redeemActivationCode',{code}); showToast('✅ VIP access activated!'); input.value=''; await refreshSubscription();}catch(e){document.getElementById('vipError').classList.add('sh'); showToast(e.message||'Invalid activation code.',true);}
+}
+async function loadVipContent(){
+  try{
+    const r=await callFunction('getVipContent');
+    const unlocked=document.getElementById('vipUnlocked'); unlocked.style.display='block';
+    unlocked.innerHTML=r.games.map(g=>`<div class="vmc today"><div class="vip-badge">👑 VIP</div>${g.imageUrl?`<img src="${g.imageUrl}" style="width:100%;border-radius:12px;margin-bottom:10px" loading="lazy">`:''}<h4>${g.title||'VIP GAME'}</h4><p style="color:#a0a0b8;font-size:11px">${g.description||''}</p><div class="vip-code-row"><span>${g.code||''}</span><button class="ub" onclick="navigator.clipboard.writeText('${String(g.code||'').replace(/'/g,"\\'")}');showToast('Game code copied!')">COPY CODE</button></div></div>`).join('')||'<p style="color:#5c5c72">No VIP games available.</p>';
+  }catch(e){document.getElementById('vipUnlocked').style.display='none';}
+}
+auth.onAuthStateChanged(async user=>{
+  currentUser=user;
+  const gate=document.getElementById('vipAuthGate');
+  if(user){gate.innerHTML=`<div class="vip-user">Signed in as <strong>${user.email}</strong></div>`; await refreshSubscription(); await verifyReturnedPayment();}
+  else {gate.style.display='block'; document.getElementById('vipPlans').style.display='none'; document.getElementById('vipLocked').style.display='none'; document.getElementById('vipStatus').style.display='none'; document.getElementById('vipUnlocked').style.display='none';}
+});
+document.addEventListener('DOMContentLoaded', async ()=>{
+  const g=document.getElementById('googleBtn'); if(g)g.onclick=signInGoogle;
+  const b=document.getElementById('vipBtn'); if(b)b.onclick=activateCode;
+  const i=document.getElementById('vipInput'); if(i)i.onkeydown=e=>{if(e.key==='Enter')activateCode();};
+  await handleGoogleRedirect();
+});
+
+// ---------- NOTIFICATIONS (using localStorage only for read status, not core data) ----------
+function timeAgo(tm){
+  const diff = Math.floor((new Date() - new Date(tm))/1000);
+  if(diff<60) return 'now';
+  if(diff<3600) return Math.floor(diff/60)+'m';
+  if(diff<86400) return Math.floor(diff/3600)+'h';
+  return Math.floor(diff/86400)+'d';
+}
+function getUnreadCount(){
+  const seen = JSON.parse(localStorage.getItem('seenBC') || '[]');
+  return (appData.bc || []).filter(b => !seen.includes(b.id || b.tm)).length;
+}
+function updateBadge(){
+  const c = getUnreadCount();
+  const b = document.getElementById('notifBadge');
+  if(c>0){ b.textContent = c; b.classList.add('show'); }
+  else b.classList.remove('show');
+}
+function markAllRead(){
+  const uniq = (appData.bc || []).map(b => b.id || b.tm);
+  localStorage.setItem('seenBC', JSON.stringify(uniq));
+  updateBadge();
+  renderNotifPanel();
+}
+function closeNotifPanel(){ document.getElementById('notifOverlay').classList.remove('show'); }
+function renderNotifPanel(){
+  const list = document.getElementById('npList');
+  if(!appData.bc || !appData.bc.length){
+    list.innerHTML = '<div class="np-empty"><i class="fa-solid fa-bell-slash"></i>No notifications yet</div>';
+    return;
+  }
+  const seen = JSON.parse(localStorage.getItem('seenBC') || '[]');
+  list.innerHTML = appData.bc.slice().reverse().map(b => {
+    const isNew = !seen.includes(b.id || b.tm);
+    return `<div class="np-item"><div class="np-icon${isNew ? ' new' : ''}">📢</div><div class="np-content"><div class="np-app">Bet Insider</div><div class="np-body">${b.body}</div><div class="np-time">${timeAgo(b.tm)}</div></div>${isNew ? '<div class="np-dot"></div>' : '<div class="np-dot read"></div>'}</div>`;
+  }).join('');
+}
+function toggleNotifDropdown(){
+  const overlay = document.getElementById('notifOverlay');
+  if(overlay.classList.contains('show')) closeNotifPanel();
+  else { renderNotifPanel(); overlay.classList.add('show'); markAllRead(); }
+}
+function showBannerNotification(){
+  if(!appData.bc || !appData.bc.length) return;
+  const last = appData.bc[appData.bc.length-1];
+  const seen = JSON.parse(localStorage.getItem('seenBC') || '[]');
+  if(seen.includes(last.id || last.tm)) return;
+  // only show banner if not already read
+  const banner = document.createElement('div');
+  banner.className = 'ip-banner';
+  banner.innerHTML = `<div class="ip-icon">📢</div><div class="ip-content"><div class="ip-app">Bet Insider</div><div class="ip-title">${last.title}</div><div class="ip-body">${last.body}</div></div>`;
+  banner.onclick = function(){
+    this.classList.remove('show');
+    setTimeout(() => this.remove(), 400);
+    toggleNotifDropdown();
+  };
+  document.body.appendChild(banner);
+  requestAnimationFrame(() => banner.classList.add('show'));
+  setTimeout(() => {
+    if(banner.parentNode){ banner.classList.remove('show'); setTimeout(() => banner.remove(), 400); }
+  }, 5000);
+}
+
+// ---------- INITIAL RENDER (data already populated from Firestore realtime) ----------
+window.addEventListener('DOMContentLoaded', () => {
+  // UI will be updated via onSnapshot, but call once to fill
+  LFT();
+  LSS();
+  updateBadge();
+  // Optionally show new banner after a short delay
+  setTimeout(showBannerNotification, 1500);
+  setInterval(showBannerNotification, 30000);
+});
+</script>
+</body>
+</html>
