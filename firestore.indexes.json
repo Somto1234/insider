@@ -1,0 +1,28 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "plans",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath":"active","order":"ASCENDING"},
+        {"fieldPath":"sort","order":"ASCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "payments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath":"method","order":"ASCENDING"},
+        {"fieldPath":"createdAt","order":"DESCENDING"}
+      ]
+    },
+    {
+      "collectionGroup": "vipGames",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath":"createdAt","order":"DESCENDING"}
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

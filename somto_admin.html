@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>Bet Insider Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
+  <style>
+:root {
+    --bg: #0a0a0f;
+    --bg2: #0f0f17;
+    --bg3: #15151f;
+    --t: #f0f0f5;
+    --t2: #a0a0b8;
+    --t3: #555568;
+    --g: #c9a84c;
+    --gl: #e0c460;
+    --gr: #22c55e;
+    --rd: #ef4444;
+    --bl: #5b9bd5;
+    --br: rgba(255,255,255,.03);
+    --bc: rgba(255,255,255,.05)
+  }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent
+    }
+    html,body {
+      height: 100%;
+      font-family: 'Inter',sans-serif;
+      background: var(--bg);
+      color: var(--t);
+      overflow: hidden
+    }
+    .ls {
+      position: fixed;
+      inset: 0;
+      background: var(--bg);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 20px
+    }
+
+    .ls.hd {
+      display: none
+    }
+    .lb {
+      width: 100%;
+      max-width: 300px;
+      text-align: center
+    }
+
+    .lb i {
+      font-size: 40px;
+      color: var(--g);
+      margin-bottom: 12px
+    }
+
+    .lb h2 {
+      font-weight: 700;
+      font-size: 17px;
+      margin-bottom: 2px
+    }
+
+    .lb p {
+      font-size: 9px;
+      color: var(--t3);
+      margin-bottom: 16px
+    }
+
+    .lb input {
+      width: 100%;
+      background: var(--bg3);
+      border: 1.5px solid var(--br);
+      color: var(--t);
+      padding: 11px;
+      border-radius: 9px;
+      font-size: 12px;
+      text-align: center;
+      letter-spacing: 3px;
+      outline: none;
+      font-family: 'Inter',sans-serif;
+      margin-bottom: 10px
+    }
+
+    .lb input:focus {
+      border-color: var(--g)
+    }
+
+    .lb button {
+      width: 100%;
+      background: var(--g);
+      color: #000;
+      padding: 11px;
+      border-radius: 9px;
+      font-weight: 700;
+      font-size: 12px;
+      cursor: pointer;
+      border: none;
+      font-family: 'Inter',sans-serif;
+      letter-spacing: 1px
+    }
+
+    .lb .er {
+      color: var(--rd);
+      font-size: 9px;
+      margin-top: 6px;
+      display: none
+    }
+
+    .lb .er.sh {
+      display: block
+    }
+    .app {
+      display: flex;
+      height: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden
+    }
+    .sb {
+      width: 270px;
+      height: 100%;
+      background: var(--bg2);
+      border-right: 1px solid var(--br);
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 100;
+      transform: translateX(-100%);
+      transition: .3s;
+      display: flex;
+      flex-direction: column
+    }
+
+    .sb.op {
+      transform: translateX(0)
+    }
+    .sbh {
+      padding: 16px 14px;
+      border-bottom: 1px solid var(--br);
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .sbl {
+      width: 34px;
+      height: 34px;
+      background: var(--g);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 16px;
+      color: #000
+    }
+
+    .sbt {
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 1.2
+    }
+
+    .sbt span {
+      display: block;
+      font-size: 7px;
+      letter-spacing: 2px;
+      color: var(--g);
+      text-transform: uppercase
+    }
+    .sbn {
+      flex: 1;
+      padding: 8px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      overflow-y: auto
+    }
+
+    .sbi {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 11px 13px;
+      border-radius: 9px;
+      cursor: pointer;
+      color: var(--t2);
+      font-weight: 500;
+      font-size: 11px;
+      transition: .15s
+    }
+
+    .sbi:hover,.sbi.ac {
+      background: rgba(201,168,76,.06);
+      color: var(--g)
+    }
+
+    .sbi i {
+      width: 16px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--t3)
+    }
+
+    .sbi.ac i {
+      color: var(--g)
+    }
+    .sbd {
+      margin: 4px 8px;
+      height: 1px;
+      background: linear-gradient(90deg,transparent,rgba(201,168,76,.2),transparent)
+    }
+    .sbf {
+      padding: 10px;
+      border-top: 1px solid var(--br);
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .sba {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--g);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px;
+      color: #000
+    }
+
+    .sbu {
+      font-size: 10px;
+      font-weight: 600
+    }
+
+    .sbr {
+      font-size: 7px;
+      color: var(--t3);
+      text-transform: uppercase
+    }
+    .mn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden
+    }
+    .tb {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 13px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--br)
+    }
+    .mb {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      border-radius: 7px
+    }
+
+    .mb span {
+      display: block;
+      width: 17px;
+      height: 2px;
+      background: var(--g);
+      border-radius: 1px;
+      transition: .3s
+    }
+
+    .mb.op span:nth-child(1) {
+      transform: rotate(45deg)translate(4px,4px)
+    }
+
+    .mb.op span:nth-child(2) {
+      opacity: 0
+    }
+
+    .mb.op span:nth-child(3) {
+      transform: rotate(-45deg)translate(4px,-4px)
+    }
+    .ttl {
+      font-weight: 700;
+      font-size: 13px
+    }
+
+    .tac {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--g);
+      font-size: 13px;
+      cursor: pointer;
+      border-radius: 50%;
+      transition: .15s
+    }
+
+    .tac:active {
+      background: rgba(201,168,76,.1)
+    }
+    .scr {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px
+    }
+    .sg {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-bottom: 10px
+    }
+    .st {
+      background: var(--bg3);
+      border: 1px solid var(--br);
+      border-radius: 9px;
+      padding: 11px;
+      text-align: center
+    }
+
+    .st .sv {
+      font-weight: 800;
+      font-size: 19px
+    }
+
+    .st .sl {
+      font-size: 7px;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-top: 2px
+    }
+
+    .st.gd {
+      border-color: rgba(201,168,76,.15)
+    }
+
+    .st.gd .sv {
+      color: var(--gl)
+    }
+    .cd {
+      background: var(--bg3);
+      border: 1px solid var(--br);
+      border-radius: 9px;
+      overflow: hidden;
+      margin-bottom: 8px
+    }
+    .ch {
+      padding: 9px 11px;
+      border-bottom: 1px solid var(--br);
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .ch h3 {
+      font-size: 10px;
+      font-weight: 700
+    }
+
+    .ch h3 i {
+      color: var(--g);
+      margin-right: 4px
+    }
+    .btn {
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 8px;
+      cursor: pointer;
+      border: none;
+      font-family: 'Inter',sans-serif;
+      white-space: nowrap;
+      transition: .15s
+    }
+
+    .btn:active {
+      transform: scale(.95)
+    }
+
+    .btn.gd {
+      background: var(--g);
+      color: #000
+    }
+
+    .btn.ot {
+      background: transparent;
+      border: 1px solid var(--bc);
+      color: var(--t2)
+    }
+
+    .btn.rd {
+      background: var(--rd);
+      color: #fff
+    }
+
+    .btn.bl {
+      background: var(--bl);
+      color: #fff
+    }
+
+    .btn.gr {
+      background: var(--gr);
+      color: #000
+    }
+    .li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 11px;
+      border-bottom: 1px solid var(--br);
+      gap: 7px
+    }
+
+    .li:last-child {
+      border-bottom: none
+    }
+    .lf {
+      flex: 1;
+      min-width: 0
+    }
+
+    .lt {
+      font-weight: 600;
+      font-size: 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .lsb {
+      font-size: 7px;
+      color: var(--t3);
+      margin-top: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .la {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      padding: 2px 5px;
+      border-radius: 5px;
+      font-weight: 600;
+      font-size: 7px
+    }
+
+    .tag.gr {
+      background: rgba(34,197,94,.1);
+      color: var(--gr)
+    }
+
+    .tag.yl {
+      background: rgba(234,179,8,.1);
+      color: #eab308
+    }
+
+    .tag.rd {
+      background: rgba(239,68,68,.08);
+      color: var(--rd)
+    }
+
+    .tag .dt {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      display: inline-block
+    }
+
+    .tag .dt.gn {
+      background: var(--gr)
+    }
+
+    .tag .dt.rd {
+      background: var(--rd)
+    }
+    .emp {
+      text-align: center;
+      padding: 14px;
+      color: var(--t3);
+      font-size: 9px
+    }
+    .ov {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      z-index: 90;
+      opacity: 0;
+      pointer-events: none;
+      transition: .3s
+    }
+
+    .ov.op {
+      opacity: 1;
+      pointer-events: auto
+    }
+    .md {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.8);
+      z-index: 200;
+      display: none;
+      align-items: flex-end
+    }
+
+    .md.sh {
+      display: flex
+    }
+
+    .mi {
+      background: var(--bg2);
+      border-radius: 12px 12px 0 0;
+      padding: 14px 12px 18px;
+      width: 100%;
+      max-width: 430px;
+      margin: 0 auto;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: su .25s ease
+    }
+
+    @keyframes su {
+      from {
+        transform: translateY(100%)
+      }
+
+      to {
+        transform: translateY(0)
+      }}
+    .mh {
+      width: 26px;
+      height: 3px;
+      background: var(--t3);
+      border-radius: 2px;
+      margin: 0 auto 10px
+    }
+
+    .mtt {
+      font-weight: 700;
+      font-size: 13px;
+      text-align: center;
+      margin-bottom: 10px
+    }
+    .fg {
+      margin-bottom: 7px
+    }
+
+    .fg label {
+      display: block;
+      font-size: 7px;
+      color: var(--t3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 2px;
+      font-weight: 600
+    }
+
+    .fi {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--br);
+      color: var(--t);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 10px;
+      outline: none;
+      font-family: 'Inter',sans-serif
+    }
+
+    .fi:focus {
+      border-color: var(--g)
+    }
+
+    .fr {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px
+    }
+
+    .ma {
+      display: flex;
+      gap: 5px;
+      justify-content: flex-end;
+      margin-top: 10px
+    }
+  .google-admin-signin{width:100%;min-height:52px;background:#fff;color:#202124;border:1px solid #dadce0;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:12px;font-family:Arial,sans-serif;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.15);transition:transform .18s ease,box-shadow .18s ease,background .18s ease}.google-admin-signin:hover{background:#f8f9fa;box-shadow:0 2px 6px rgba(0,0,0,.2);transform:translateY(-1px)}.google-admin-signin:disabled{opacity:.65;cursor:wait;transform:none}.google-admin-logo{width:20px;height:20px;display:block}
+</style>
+</head>
+<body>
+  <div class="ls" id="ls">
+    <div class="lb">
+      <i class="fa-solid fa-shield-halved"></i><h2>Admin Access</h2><p>
+        Sign in with the authorized Google account to continue
+      </p>
+      <button id="googleAdminBtn" class="google-admin-signin" type="button" aria-label="Sign in with Google"><svg class="google-admin-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M21.35 12.27c0-.72-.06-1.42-.18-2.09H12v3.95h5.24a4.48 4.48 0 0 1-1.94 2.94v2.45h3.14c1.84-1.7 2.91-4.2 2.91-7.25z"/><path fill="#34A853" d="M12 21.99c2.63 0 4.84-.87 6.45-2.36l-3.14-2.45c-.87.58-1.98.92-3.31.92-2.55 0-4.71-1.72-5.49-4.03H3.26v2.53A9.75 9.75 0 0 0 12 21.99z"/><path fill="#FBBC05" d="M6.51 14.07A5.86 5.86 0 0 1 6.2 12c0-.72.12-1.42.31-2.07V7.4H3.26A9.99 9.99 0 0 0 2.25 12c0 1.61.39 3.13 1.01 4.6l3.25-2.53z"/><path fill="#EA4335" d="M12 5.9c1.43 0 2.71.49 3.72 1.45l2.79-2.79C16.83 2.95 14.63 2 12 2a9.75 9.75 0 0 0-8.74 5.4l3.25 2.53C7.29 7.62 9.45 5.9 12 5.9z"/></svg><span>Sign in with Google</span></button>
+      <div class="er" id="le">Access denied. This Google account is not authorized.</div>
+    </div>
+  </div>
+  <div class="app">
+    <div class="ov" id="ov" onclick="ts()"></div>
+    <aside class="sb" id="sd">
+      <div class="sbh">
+        <div class="sbl">
+          👑
+        </div>
+        <div class="sbt">
+          BET INSIDER<span>ADMIN PANEL</span>
+        </div>
+      </div>
+      <nav class="sbn">
+        <a href="#" class="sbi ac" onclick="sh('db');ts()"><i class="fa-solid fa-grid-2"></i>DASHBOARD</a>
+        <a href="#" class="sbi" onclick="sendBC();ts()"><i class="fa-solid fa-tower-broadcast"></i>BROADCAST</a>
+        <a href="#" class="sbi" onclick="sh('mt');ts()"><i class="fa-solid fa-futbol"></i>MATCHES</a>
+        <a href="#" class="sbi" onclick="sh('vc');ts()"><i class="fa-solid fa-crown"></i>VIP CODES</a>
+        <a href="#" class="sbi" onclick="sh('pl');ts()"><i class="fa-solid fa-tags"></i>VIP PLANS</a>
+        <a href="#" class="sbi" onclick="sh('py');ts()"><i class="fa-solid fa-credit-card"></i>PAYMENTS</a>
+        <a href="#" class="sbi" onclick="sh('ps');ts()"><i class="fa-solid fa-sliders"></i>PAYMENT SETTINGS</a>
+        <a href="#" class="sbi" onclick="sh('gm');ts()"><i class="fa-solid fa-image"></i>VIP GAMES</a>
+        <a href="#" class="sbi" onclick="createTimedCode(7)" style="color:#e0c460;font-weight:600"><i class="fa-solid fa-clock"></i>7-DAY VIP</a>
+        <a href="#" class="sbi" onclick="createTimedCode(30)" style="color:#e0c460;font-weight:600"><i class="fa-solid fa-calendar"></i>30-DAY VIP</a>
+        <a href="#" class="sbi" onclick="sh('ft');ts()"><i class="fa-solid fa-trophy"></i>FREE TIPS</a>
+        <a href="#" class="sbi" onclick="sh('vt');ts()"><i class="fa-solid fa-fire"></i>VVIP TIPS</a>
+        <div class="sbd"></div>
+        <a href="#" class="sbi" onclick="sh('us');ts()"><i class="fa-solid fa-users"></i>UNLOCK LOG</a>
+        <a href="#" class="sbi" onclick="sh('sx');ts()"><i class="fa-solid fa-gear"></i>SETTINGS</a>
+        <a href="index.html" target="_blank" class="sbi"><i class="fa-solid fa-up-right-from-square"></i>VIEW SITE</a>
+        <a href="#" class="sbi" onclick="adminLogout()"><i class="fa-solid fa-right-from-bracket"></i>SIGN OUT</a>
+      </nav>
+      <div class="sbf">
+        <div class="sba">
+          PRO
+        </div>
+        <div class="sbu">
+          Official Admin<div class="sbr">
+            BET INSIDER ADMIN
+          </div>
+        </div>
+      </div>
+    </aside>
+    <div class="mn">
+      <div class="tb">
+        <div class="mb" id="mb" onclick="ts()">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="ttl" id="pt">
+          DASHBOARD
+        </div>
+        <div style="display:flex;gap:4px">
+          <div class="tac" onclick="ed()">
+            <i class="fa-solid fa-download"></i>
+          </div>
+          <div class="tac" onclick="id2()">
+            <i class="fa-solid fa-upload"></i>
+          </div>
+          <div class="tac" onclick="if(confirm('Reset all?')){resetAllData()}">
+            <i class="fa-solid fa-rotate"></i>
+          </div>
+        </div>
+      </div>
+      <div class="scr" id="sa"></div>
+    </div>
+  </div>
+  <div class="md" id="md" onclick="if(event.target===this)cl()">
+    <div class="mi" id="mc"></div>
+  </div>
+
+  <script>
+    // ---------- FIREBASE CONFIGURATION (same as user panel) ----------
+    const firebaseConfig = {
+      apiKey: "AIzaSyBH02GdlHfAA4LNsxbBisZdFcB9NM6r5LI",
+      authDomain: "bet-insider-pro.firebaseapp.com",
+      projectId: "bet-insider-pro",
+      storageBucket: "bet-insider-pro.firebasestorage.app",
+      messagingSenderId: "173152532136",
+      appId: "1:173152532136:web:dc64e4db6c04daf02ff49d",
+      measurementId: "G-LQPBG9EN1V"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const DR = db.collection('admin').doc('main');
+    const publicDR = db.collection('public').doc('main');
+    const auth = firebase.auth();
+    const storage = firebase.storage();
+    const functions = firebase.functions();
+    const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+    // Admin identity is enforced by Firebase custom claims/server functions. No PIN or password is stored in this page.
+    
+    // ---------- GLOBAL DATA (no localStorage) ----------
+    let appData = {
+      m: [],
+      vc: [],
+      st: {
+        tl: 'Bet Insider',
+        tg: 'PREMIUM TIPS',
+        to: '2.17',
+        ft: 'Responsible Gambling (18+ only) | Bet Insider is not a bookmaker | Results are not guaranteed.'
+      },
+      ul: [],
+      bc: [],
+      lk: {},
+      timedCodes: [],
+      plans: [],
+      paymentSettings: {},
+      manualPaymentSettings: {}
+    };
+
+    let isLoading = true;
+
+    // Helper: show temporary toast message
+    function showToast(msg, isError = false) {
+      let toast = document.createElement('div');
+      toast.textContent = msg;
+      toast.style.position = 'fixed';
+      toast.style.bottom = '20px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.background = isError ? '#ef4444' : '#c9a84c';
+      toast.style.color = isError ? '#fff' : '#000';
+      toast.style.padding = '8px 16px';
+      toast.style.borderRadius = '20px';
+      toast.style.fontSize = '11px';
+      toast.style.fontWeight = 'bold';
+      toast.style.zIndex = '9999';
+      toast.style.whiteSpace = 'nowrap';
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2000);
+    }
+
+    // Load data from Firestore
+    async function loadData() {
+      try {
+        let snapshot = await DR.get();
+        // One-time migration from the old public data document.
+        if (!snapshot.exists) {
+          const legacy = await db.collection('data').doc('main').get();
+          if (legacy.exists) {
+            await DR.set(legacy.data());
+            snapshot = await DR.get();
+          }
+        }
+        if (snapshot.exists) {
+          appData = snapshot.data();
+          if (!appData.m) appData.m = [];
+          if (!appData.vc) appData.vc = [];
+          if (!appData.st) appData.st = {};
+          if (!appData.ul) appData.ul = [];
+          if (!appData.bc) appData.bc = [];
+          if (!appData.lk) appData.lk = {};
+          if (!appData.timedCodes) appData.timedCodes = [];
+          if (!appData.plans) appData.plans = [];
+          if (!appData.paymentSettings) appData.paymentSettings = {};
+          if (!appData.manualPaymentSettings) appData.manualPaymentSettings = {};
+          if (!appData.plans.length) appData.plans = [
+            { id:'weekly', name:'Weekly VIP', price:0, durationDays:7, active:false, sort:1 },
+            { id:'monthly', name:'Monthly VIP', price:0, durationDays:30, active:false, sort:2 }
+          ];
+        } else {
+          // Initialize Firestore doc with default data
+          await DR.set(appData);
+        }
+        isLoading = false;
+        return true;
+      } catch(err) {
+        console.error("Firestore read error:", err);
+        showToast('⚠️ Could not load data from cloud', true);
+        isLoading = false;
+        return false;
+      }
+    }
+
+    // Save admin data and publish only safe public data.
+    async function saveData() {
+      try {
+        await DR.set(appData);
+        const publicData = {
+          m: (appData.m || []).filter(m => m.ty === 'free' && m.ac),
+          st: appData.st || {},
+          bc: appData.bc || [],
+          lk: appData.lk || {}
+        };
+        await publicDR.set(publicData);
+        showToast('✅ Saved securely');
+        return true;
+      } catch(err) {
+        console.error('Firestore write error:', err);
+        showToast('⚠️ Save failed', true);
+        return false;
+      }
+    }
+
+    // Reset all data
+    async function resetAllData() {
+      appData = {
+        m: [],
+        vc: [],
+        st: {
+          tl: 'Bet Insider',
+          tg: 'PREMIUM TIPS',
+          to: '2.17',
+          ft: 'Responsible Gambling (18+ only) | Bet Insider is not a bookmaker | Results are not guaranteed.'
+        },
+        ul: [],
+        bc: [],
+        lk: {},
+        timedCodes: [],
+        plans: [],
+        paymentSettings: {},
+        manualPaymentSettings: {}
+      };
+      await saveData();
+      location.reload();
+    }
+
+    // Google admin authentication — no public PIN/password.
+    async function adminLogin(){
+      const btn = document.getElementById('googleAdminBtn');
+      if(btn){ btn.disabled = true; const label=btn.querySelector('span'); if(label) label.textContent='Opening Google...'; }
+      try {
+        googleProvider.setCustomParameters({ prompt: 'select_account' });
+        let user;
+        try {
+          const result = await auth.signInWithPopup(googleProvider);
+          user = result.user;
+        } catch(popupError){
+          if(popupError && (popupError.code === 'auth/popup-blocked' || popupError.code === 'auth/popup-closed-by-user')){
+            await auth.signInWithRedirect(googleProvider);
+            return;
+          }
+          throw popupError;
+        }
+        try { await functions.httpsCallable('ensureAdminClaim')({}); } catch(e) { console.error('Admin claim error:', e); }
+        await user.getIdToken(true);
+        const token = await user.getIdTokenResult(true);
+        if(token.claims.admin === true){
+          document.getElementById('ls').classList.add('hd');
+          await loadData();
+          sh('db');
+        } else {
+          document.getElementById('le').textContent = 'Access denied. This Google account is not authorized as admin.';
+          document.getElementById('le').classList.add('sh');
+          await auth.signOut();
+        }
+      } catch(err){
+        console.error('Admin Google sign-in error:', err);
+        const code = err && err.code ? ` (${err.code})` : '';
+        document.getElementById('le').textContent = `Google sign-in failed${code}. Check Firebase Authentication and Authorized Domains.`;
+        document.getElementById('le').classList.add('sh');
+      } finally {
+        if(btn){ btn.disabled = false; const label=btn.querySelector('span'); if(label) label.textContent='Sign in with Google'; }
+      }
+    }
+    async function adminLogout(){ await auth.signOut(); location.reload(); }
+    document.getElementById('googleAdminBtn').addEventListener('click', adminLogin);
+    auth.onAuthStateChanged(async user=>{
+      if(!user) return;
+      try {
+        try { await functions.httpsCallable('ensureAdminClaim')({}); } catch(e) { console.error('Admin claim error:', e); }
+        await user.getIdToken(true);
+        const token = await user.getIdTokenResult(true);
+        if(token.claims.admin === true){
+          document.getElementById('ls').classList.add('hd');
+          await loadData();
+          sh('db');
+        } else {
+          await auth.signOut();
+          document.getElementById('le').textContent = 'Access denied. This Google account is not authorized as admin.';
+          document.getElementById('le').classList.add('sh');
+        }
+      } catch(e){
+        console.error('Admin auth state error:', e);
+      }
+    });
+
+    // Complete Google redirect sign-in when a popup is blocked by the browser.
+    auth.getRedirectResult().catch(err=>{
+      if(err && err.code) console.error('Admin redirect result error:', err);
+    });
+
+    // Backup (export)
+    function ed() {
+      const dataToBackup = JSON.stringify(appData);
+      const bl = new Blob([dataToBackup], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(bl);
+      a.download = 'bi_backup_'+new Date().toISOString().slice(0,10)+'.json';
+      a.click();
+      showToast('✅ Backup saved');
+    }
+    
+    // Restore (import)
+    function id2() {
+      const i = document.createElement('input');
+      i.type = 'file';
+      i.accept = '.json';
+      i.onchange = async function(e) {
+        const f = e.target.files[0];
+        const r = new FileReader();
+        r.onload = async function(ev) {
+          try {
+            const data = JSON.parse(ev.target.result);
+            appData = data;
+            await saveData();
+            showToast('✅ Restored successfully');
+            location.reload();
+          } catch(e) {
+            showToast('Invalid file', true);
+          }
+        };
+        r.readAsText(f);
+      };
+      i.click();
+    }
+    
+    // Broadcast modal
+    function sendBC() {
+      document.getElementById('mc').innerHTML = `<div class="mh"></div><div class="mtt">📢 SEND BROADCAST</div><div class="fg"><label>TITLE</label><input class="fi" id="bcTitle" placeholder="e.g. 🔥 New Games!"></div><div class="fg"><label>MESSAGE</label><textarea class="fi" id="bcBody" rows="3" placeholder="Tell users...">Free tips & VVIP picks now available!</textarea></div><div class="ma"><button class="btn ot" onclick="cl()">CANCEL</button><button class="btn gd" onclick="sb()"><i class="fa-solid fa-paper-plane"></i> SEND</button></div>`;
+      document.getElementById('md').classList.add('sh');
+    }
+    
+    async function sb() {
+      const t = document.getElementById('bcTitle').value.trim();
+      const b = document.getElementById('bcBody').value.trim();
+      if (!t) return showToast('Enter title!', true);
+      if (!b) return showToast('Enter message!', true);
+      if (!appData.bc) appData.bc = [];
+      appData.bc.push({
+        id: 'bc_'+Date.now(),
+        title: t,
+        body: b,
+        tm: new Date().toISOString()
+      });
+      await saveData();
+      cl();
+      showToast('📢 Broadcast sent!');
+    }
+    
+    // Helper for generating new ID
+    const NI = (a) => {
+      let m = 0;
+      a.forEach(x => { if (x.id > m) m = x.id; });
+      return m+1;
+    };
+    
+    function ts() {
+      document.getElementById('sd').classList.toggle('op');
+      document.getElementById('ov').classList.toggle('op');
+      document.getElementById('mb').classList.toggle('op');
+    }
+    
+    function sh(id) {
+      const titles = {
+        db: 'DASHBOARD', bc: 'BROADCAST', mt: 'MATCHES', vc: 'VIP CODES', pl:'VIP PLANS', py:'PAYMENTS', ps:'PAYMENT SETTINGS', gm:'VIP GAMES', ft: 'FREE TIPS', vt: 'VVIP TIPS', us: 'UNLOCK LOG', sx: 'SETTINGS'
+      };
+      document.getElementById('pt').textContent = titles[id];
+      document.querySelectorAll('.sbi').forEach(i => i.classList.remove('ac'));
+      const indexMap = { db: 0, bc: 1, mt: 2, vc: 3, pl:4, py:5, ps:6, gm:7, ft:10, vt:11, us:12, sx:13 };
+      const items = document.querySelectorAll('.sbi');
+      if (items[indexMap[id]]) items[indexMap[id]].classList.add('ac');
+      renderSection(id);
+    }
+    
+    function renderSection(id) {
+      const d = appData;
+      let html = '';
+      const container = document.getElementById('sa');
+      
+      if (id === 'db') {
+        const freeCount = d.m.filter(m => m.ty === 'free' && m.ac).length;
+        const vipCount = d.m.filter(m => m.ty === 'vvip' && m.ac).length;
+        const todayUnlocks = d.ul.filter(l => new Date(l.tm).toDateString() === new Date().toDateString()).length;
+        const totalOdds = d.m.filter(m => m.ac).reduce((a, m) => a + parseFloat(m.od || 0), 0).toFixed(2);
+        html = `<div class="sg"><div class="st gd"><div class="sv">${totalOdds}</div><div class="sl">TOTAL ODDS</div></div><div class="st"><div class="sv" style="color:#5b9bd5">${freeCount}</div><div class="sl">FREE TIPS</div></div><div class="st"><div class="sv" style="color:#e0c460">${vipCount}</div><div class="sl">VVIP TIPS</div></div><div class="st"><div class="sv" style="color:#22c55e">${todayUnlocks}</div><div class="sl">UNLOCKS TODAY</div></div></div><div class="cd"><div class="ch"><h3><i class="fa-solid fa-clock-rotate-left"></i> RECENT ACTIVITY</h3></div>${d.ul.slice(-6).reverse().map(l => `<div class="li"><div class="lf"><div class="lt">${l.ac}</div><div class="lsb">${l.dt} · ${new Date(l.tm).toLocaleString()}</div></div></div>`).join('') || '<div class="emp">No activity yet</div>'}</div>`;
+      } 
+      else if (id === 'mt') {
+        html = `<div class="cd"><div class="ch"><h3><i class="fa-solid fa-futbol"></i> MATCHES (${d.m.length})</h3><button class="btn gd" onclick="openMatchModal()">+ ADD</button></div>${d.m.map(m => {
+          const goalText = m.goals ? ` · ⚽ ${m.goals} goals` : '';
+          const resultText = m.result === 'win' ? ' · 🟩 WIN' : m.result === 'loss' ? ' · 🟥 LOSS' : '';
+          return `<div class="li"><div class="lf"><div class="lt">${m.fl} ${m.t1} vs ${m.t2}</div><div class="lsb">${m.dt || ''} · ${m.tp} · ${m.od} · ${m.tm}${goalText}${resultText} · <span class="tag ${m.ty === 'vvip' ? 'yl' : 'gr'}">${m.ty.toUpperCase()}</span></div></div><div class="la"><button class="btn ot" onclick="openMatchModal(${m.id})"><i class="fa-solid fa-pen"></i></button><button class="btn rd" onclick="deleteMatch(${m.id})"><i class="fa-solid fa-trash"></i></button></div></div>`;
+        }).join('') || '<div class="emp">No matches yet</div>'}</div>`;
+      }
+      else if (id === 'vc') {
+        const timed = d.timedCodes || [];
+        html = `<div class="cd"><div class="ch"><h3><i class="fa-solid fa-crown"></i> VIP CODES (${d.vc.length})</h3><button class="btn gd" onclick="openVipCodeModal()">+ NEW</button></div>${d.vc.map(c => {
+          const used = d.ul.filter(l => l.cd === c.cd).length;
+          const tc = timed.find(t => t.code === c.cd);
+          let expiry = '';
+          if (tc) {
+            const days = Math.ceil((new Date(tc.expires) - new Date()) / (86400000));
+            expiry = days > 0 ? ` · ⏳ ${days}d left` : ' · ❌ Expired';
+          }
+          return `<div class="li"><div class="lf"><div class="lt"><strong>${c.cd}</strong> <span class="tag ${c.ac ? 'gr' : 'rd'}">${c.ac ? 'ACTIVE' : 'OFF'}</span></div><div class="lsb">Used ${used} times${expiry}</div></div><div class="la">${c.ac ? `<button class="btn rd" onclick="toggleVipCode('${c.cd}')"><i class="fa-solid fa-ban"></i></button>` : `<button class="btn gr" onclick="toggleVipCode('${c.cd}')"><i class="fa-solid fa-check"></i></button>`}<button class="btn rd" onclick="deleteVipCode('${c.cd}')"><i class="fa-solid fa-trash"></i></button></div></div>`;
+        }).join('') || '<div class="emp">No VIP codes yet</div>'}</div>`;
+      }
+      else if (id === 'ft') {
+        const freeMatches = d.m.filter(m => m.ty === 'free');
+        html = `<div class="cd"><div class="ch"><h3><i class="fa-solid fa-trophy"></i> FREE TIPS</h3><button class="btn gd" onclick="openMatchModal(null, 'free')">+ ADD</button></div>${freeMatches.map(m => {
+          const goalText = m.goals ? ` · ⚽ ${m.goals} goals` : '';
+          const resultText = m.result === 'win' ? ' · 🟩 WIN' : m.result === 'loss' ? ' · 🟥 LOSS' : '';
+          return `<div class="li"><div class="lf"><div class="lt">${m.fl} ${m.t1} vs ${m.t2}</div><div class="lsb">${m.dt || ''} · ${m.tp} · ${m.od} · ${m.tm}${goalText}${resultText}</div></div><div class="la"><button class="btn ot" onclick="openMatchModal(${m.id})"><i class="fa-solid fa-pen"></i></button><button class="btn rd" onclick="deleteMatch(${m.id})"><i class="fa-solid fa-trash"></i></button></div></div>`;
+        }).join('') || '<div class="emp">No free tips yet</div>'}</div>`;
+      }
+      else if (id === 'vt') {
+        const vipMatches = d.m.filter(m => m.ty === 'vvip');
+        html = `<div class="cd"><div class="ch"><h3><i class="fa-solid fa-fire"></i> VVIP TIPS</h3><button class="btn gd" onclick="openMatchModal(null, 'vvip')">+ ADD</button></div>${vipMatches.map(m => {
+          const goalText = m.goals ? ` · ⚽ ${m.goals} goals` : '';
+          const resultText = m.result === 'win' ? ' · 🟩 WIN' : m.result === 'loss' ? ' · 🟥 LOSS' : '';
+          return `<div class="li"><div class="lf"><div class="lt">${m.fl} ${m.t1} vs ${m.t2}</div><div class="lsb">${m.dt || ''} · ${m.tp} · ${m.od} · ${m.tm}${goalText}${resultText}</div></div><div class="la"><button class="btn ot" onclick="openMatchModal(${m.id})"><i class="fa-solid fa-pen"></i></button><button class="btn rd" onclick="deleteMatch(${m.id})"><i class="fa-solid fa-trash"></i></button></div></div>`;
+        }).join('') || '<div class="emp">No VVIP tips yet</div>'}</div>`;
+      }
+      else if (id === 'us') {
+        html = `<div class="cd"><div class="ch"><h3><i class="fa-solid fa-users"></i> UNLOCK LOG</h3></div>${d.ul.slice(-12).reverse().map(l => `<div class="li"><div class="lf"><div class="lt">${l.ac}</div><div class="lsb">${l.dt} · Code: ${l.cd || '-'} · ${new Date(l.tm).toLocaleString()}</div></div></div>`).join('') || '<div class="emp">No activity yet</div>'}</div>`;
+      }
+      else if (id === 'sx') {
+        const s = d.st || {};
+        const lk = d.lk || {};
+        html = `<div class="cd"><div class="ch"><h3><i class="fa-solid fa-gear"></i> SETTINGS</h3><button class="btn bl" onclick="saveSettings()">SAVE</button></div><div style="padding:10px"><div class="fg"><label>SITE TITLE</label><input class="fi" id="stl" value="${(s.tl || 'Bet Insider').replace(/"/g, '&quot;')}"></div><div class="fg"><label>TAGLINE</label><input class="fi" id="stg" value="${(s.tg || 'PREMIUM TIPS').replace(/"/g, '&quot;')}"></div><div class="fg"><label>TOTAL ODDS</label><input class="fi" id="sto" value="${s.to || ''}"></div><div class="fg"><label>FOOTER</label><textarea class="fi" id="sft" rows="2">${(s.ft || '').replace(/"/g, '&quot;')}</textarea></div><div class="fg"><label>🎰 AFFILIATE LINK</label><input class="fi" id="lkAF" value="${lk.affiliate || ''}"></div><div class="fg"><label>💚 WHATSAPP LINK</label><input class="fi" id="lkWA" value="${lk.whatsapp || ''}"></div><div class="fg"><label>💙 TELEGRAM LINK</label><input class="fi" id="lkTG" value="${lk.telegram || ''}"></div><div class="fg"><label>💎 200+ ODDS LINK</label><input class="fi" id="lkO2" value="${lk.odds200 || ''}"></div><div class="fg"><label>🔄 UPDATE APP LINK</label><input class="fi" id="lkUA" value="${lk.updateApp || ''}"></div><div class="fg"><label>🛡️ PRIVACY POLICY LINK</label><input class="fi" id="lkPP" value="${lk.privacy || ''}"></div></div></div>`;
+      }
+      
+      container.innerHTML = html;
+      container.scrollTop = 0;
+    }
+    
+    // Match modal
+    function openMatchModal(id = null, presetType = null) {
+      const d = appData;
+      const match = id ? d.m.find(x => x.id === id) : null;
+      const typeValue = match ? match.ty : (presetType || 'free');
+      const dateValue = match ? (match.dt || '') : new Date().toISOString().split('T')[0];
+      document.getElementById('mc').innerHTML = `<div class="mh"></div><div class="mtt">${match ? 'EDIT MATCH' : 'ADD MATCH'}</div>
+        <div class="fr"><div class="fg"><label>LEAGUE</label><input class="fi" id="ml" value="${match ? match.lg || '' : ''}"></div><div class="fg"><label>FLAG</label><input class="fi" id="mfl" value="${match ? match.fl || '' : ''}"></div></div>
+        <div class="fr"><div class="fg"><label>TEAM 1</label><input class="fi" id="mt1" value="${match ? match.t1 || '' : ''}"></div><div class="fg"><label>TEAM 2</label><input class="fi" id="mt2" value="${match ? match.t2 || '' : ''}"></div></div>
+        <div class="fr"><div class="fg"><label>TIP</label><input class="fi" id="mtp" value="${match ? match.tp || '' : ''}"></div><div class="fg"><label>ODDS</label><input class="fi" id="mod" value="${match ? match.od || '' : ''}"></div></div>
+        <div class="fr"><div class="fg"><label>TIME</label><input class="fi" id="mtm" value="${match ? match.tm || '' : ''}"></div><div class="fg"><label>TYPE</label><select class="fi" id="mty"><option value="free" ${typeValue === 'free' ? 'selected' : ''}>FREE</option><option value="vvip" ${typeValue === 'vvip' ? 'selected' : ''}>VVIP</option></select></div></div>
+        <div class="fr"><div class="fg"><label>📅 DATE</label><input class="fi" id="mdt" value="${dateValue}"></div><div class="fg"><label>⚽ GOALS</label><input class="fi" id="mgoals" value="${match ? match.goals || '' : ''}"></div></div>
+        <div class="fg"><label>📊 RESULT</label><select class="fi" id="mresult"><option value="" ${!match || !match.result ? 'selected' : ''}>-- Pending --</option><option value="win" ${match && match.result === 'win' ? 'selected' : ''}>🟩 WIN</option><option value="loss" ${match && match.result === 'loss' ? 'selected' : ''}>🟥 LOSS</option></select></div>
+        <div class="ma"><button class="btn ot" onclick="cl()">CANCEL</button><button class="btn gd" onclick="saveMatch(${id ? id : 'null'})">SAVE</button></div>`;
+      document.getElementById('md').classList.add('sh');
+    }
+    
+    async function saveMatch(id) {
+      const matchData = {
+        lg: document.getElementById('ml').value,
+        fl: document.getElementById('mfl').value,
+        t1: document.getElementById('mt1').value,
+        t2: document.getElementById('mt2').value,
+        tp: document.getElementById('mtp').value,
+        od: document.getElementById('mod').value,
+        tm: document.getElementById('mtm').value,
+        ty: document.getElementById('mty').value,
+        dt: document.getElementById('mdt').value,
+        goals: document.getElementById('mgoals').value,
+        result: document.getElementById('mresult').value,
+        ac: true
+      };
+      
+      if (id) {
+        const index = appData.m.findIndex(m => m.id === id);
+        if (index >= 0) {
+          matchData.id = id;
+          appData.m[index] = matchData;
+        }
+      } else {
+        matchData.id = NI(appData.m);
+        appData.m.push(matchData);
+      }
+      
+      await saveData();
+      cl();
+      const currentSection = document.getElementById('pt').textContent.toLowerCase().includes('matches') ? 'mt' : 
+                            (document.getElementById('pt').textContent.toLowerCase().includes('free') ? 'ft' : 'vt');
+      renderSection(currentSection === 'matches' ? 'mt' : (currentSection.includes('free') ? 'ft' : 'vt'));
+    }
+    
+    async function deleteMatch(id) {
+      if (!confirm('Delete this match?')) return;
+      appData.m = appData.m.filter(m => m.id !== id);
+      await saveData();
+      renderSection('mt');
+    }
+    
+    // VIP Code functions
+    function openVipCodeModal() {
+      document.getElementById('mc').innerHTML = `<div class="mh"></div><div class="mtt">NEW VIP CODE</div><div class="fg"><label>CODE</label><input class="fi" id="cf" placeholder="e.g. GOLDEN" autocomplete="off"></div><div class="ma"><button class="btn ot" onclick="cl()">CANCEL</button><button class="btn gd" onclick="addVipCode()">ADD</button></div>`;
+      document.getElementById('md').classList.add('sh');
+    }
+    
+    async function addVipCode() {
+      const code = document.getElementById('cf').value.trim().toUpperCase();
+      if (!code) return showToast('Enter code!', true);
+      if (appData.vc.find(c => c.cd === code)) return showToast('Code exists!', true);
+      appData.vc.push({ cd: code, ac: true });
+      await saveData();
+      cl();
+      renderSection('vc');
+      showToast(`✅ Code ${code} added`);
+    }
+    
+    async function createTimedCode(days) {
+      const code = prompt('Enter code name (e.g., JOHN_7DAYS):');
+      if (!code) return;
+      const now = new Date();
+      const expiry = new Date(now.getTime() + (days * 86400000));
+      if (!appData.timedCodes) appData.timedCodes = [];
+      appData.timedCodes.push({
+        code: code.toUpperCase(),
+        created: now.toISOString(),
+        expires: expiry.toISOString(),
+        days: days,
+        user: ''
+      });
+      if (!appData.vc.find(c => c.cd === code.toUpperCase())) {
+        appData.vc.push({ cd: code.toUpperCase(), ac: true });
+      }
+      await saveData();
+      showToast(`✅ ${code} created - expires in ${days} days`);
+      renderSection('vc');
+    }
+    
+    async function toggleVipCode(code) {
+      const vip = appData.vc.find(c => c.cd === code);
+      if (vip) {
+        vip.ac = !vip.ac;
+        await saveData();
+        renderSection('vc');
+      }
+    }
+    
+    async function deleteVipCode(code) {
+      if (!confirm(`Delete code ${code}?`)) return;
+      appData.vc = appData.vc.filter(c => c.cd !== code);
+      if (appData.timedCodes) appData.timedCodes = appData.timedCodes.filter(t => t.code !== code);
+      await saveData();
+      renderSection('vc');
+      showToast(`🗑️ Code ${code} deleted`);
+    }
+    
+    // Settings save
+    async function saveSettings() {
+      appData.st = {
+        tl: document.getElementById('stl').value,
+        tg: document.getElementById('stg').value,
+        to: document.getElementById('sto').value,
+        ft: document.getElementById('sft').value
+      };
+      appData.lk = {
+        affiliate: document.getElementById('lkAF').value,
+        whatsapp: document.getElementById('lkWA').value,
+        telegram: document.getElementById('lkTG').value,
+        odds200: document.getElementById('lkO2').value,
+        updateApp: document.getElementById('lkUA').value,
+        privacy: document.getElementById('lkPP').value
+      };
+      await saveData();
+      showToast('✅ Settings saved');
+    }
+    
+    function cl() {
+      document.getElementById('md').classList.remove('sh');
+    }
+    
+    // Auto-expire timed codes (runs every minute)
+    setInterval(async function() {
+      if (!appData.timedCodes) return;
+      const now = new Date();
+      let changed = false;
+      for (const tc of appData.timedCodes) {
+        if (new Date(tc.expires) < now) {
+          const idx = appData.vc.findIndex(v => v.cd === tc.code);
+          if (idx >= 0 && appData.vc[idx].ac !== false) {
+            appData.vc[idx].ac = false;
+            changed = true;
+          }
+        }
+      }
+      if (changed) {
+        await saveData();
+        if (document.getElementById('pt').textContent.includes('VIP CODES')) {
+          renderSection('vc');
+        }
+      }
+    }, 60000);
+    
+    // Initial load triggers after login
+
+    // ---------- MEMBERSHIP / PAYMENT / GAME MANAGEMENT ----------
+    async function savePlan(){
+      const id=document.getElementById('planId').value.trim()||('plan_'+Date.now());
+      const plan={name:document.getElementById('planName').value.trim(),price:Number(document.getElementById('planPrice').value),durationDays:Number(document.getElementById('planDays').value),active:document.getElementById('planActive').checked,sort:Number(document.getElementById('planSort').value||0)};
+      if(!plan.name||!plan.price||!plan.durationDays)return showToast('Complete plan fields.',true);
+      await db.collection('plans').doc(id).set(plan,{merge:true}); await loadData(); renderSection('pl'); showToast('Plan saved.');
+    }
+    async function deletePlan(id){if(!confirm('Delete this plan?'))return;await db.collection('plans').doc(id).delete();renderSection('pl');}
+    async function editPlan(id){const s=await db.collection('plans').doc(id).get();if(!s.exists)return;const p=s.data();document.getElementById('planId').value=id;document.getElementById('planName').value=p.name||'';document.getElementById('planPrice').value=p.price||'';document.getElementById('planDays').value=p.durationDays||7;document.getElementById('planSort').value=p.sort||1;document.getElementById('planActive').checked=p.active!==false;window.scrollTo({top:0,behavior:'smooth'});}
+    async function savePaymentSettings(){
+      const d={provider:document.getElementById('payProvider').value,publicKey:document.getElementById('payPublic').value.trim(),callbackUrl:document.getElementById('payCallback').value.trim(),webhookUrl:document.getElementById('payWebhook').value.trim(),currency:document.getElementById('payCurrency').value.trim()||'NGN',mode:document.getElementById('payMode').value};
+      await db.collection('paymentSettings').doc('main').set(d,{merge:true}); appData.paymentSettings=d; showToast('Payment settings saved.');
+    }
+    async function saveManualSettings(){
+      const d={bankName:document.getElementById('bankName').value.trim(),accountName:document.getElementById('accountName').value.trim(),accountNumber:document.getElementById('accountNumber').value.trim(),note:document.getElementById('manualNote').value.trim()};
+      await db.collection('manualPaymentSettings').doc('main').set(d,{merge:true}); appData.manualPaymentSettings=d; showToast('Manual payment details saved.');
+    }
+    async function uploadVipGame(){
+      const file=document.getElementById('gameImage').files[0]; const title=document.getElementById('gameTitle').value.trim(); const code=document.getElementById('gameCode').value.trim(); const desc=document.getElementById('gameDesc').value.trim();
+      if(!title||!code)return showToast('Title and game code are required.',true);
+      try{let storagePath=''; if(file){storagePath=`vipGames/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;await storage.ref(storagePath).put(file,{contentType:file.type});}
+        await db.collection('vipGames').add({title,code,description:desc,storagePath,active:true,createdAt:firebase.firestore.FieldValue.serverTimestamp(),createdBy:auth.currentUser.uid});
+        document.getElementById('gameTitle').value='';document.getElementById('gameCode').value='';document.getElementById('gameDesc').value='';document.getElementById('gameImage').value='';showToast('VIP game uploaded.');renderSection('gm');
+      }catch(e){showToast(e.message||'Upload failed.',true)}
+    }
+    async function toggleGame(id,active){await db.collection('vipGames').doc(id).update({active:!active});renderSection('gm');}
+    async function deleteGame(id){if(!confirm('Delete this game?'))return;await db.collection('vipGames').doc(id).delete();renderSection('gm');}
+    async function viewProof(id){
+      try{
+        const r=await functions.httpsCallable('getManualProofUrl')({paymentId:id});
+        if(r.data && r.data.url) window.open(r.data.url,'_blank');
+      }catch(e){showToast(e.message||'Could not open proof.',true);}
+    }
+    async function loadManualPayments(){
+      const snap=await db.collection('payments').where('method','==','manual').orderBy('createdAt','desc').limit(100).get();
+      return snap.docs;
+    }
+    async function approvePayment(id){try{const r=await functions.httpsCallable('approveManualPayment')({paymentId:id});showToast('Approved. Activation code: '+r.data.code);renderSection('py');}catch(e){showToast(e.message||'Approval failed.',true)}}
+    async function rejectPayment(id){const note=prompt('Reason (optional):')||'';try{await functions.httpsCallable('rejectManualPayment')({paymentId:id,note});showToast('Payment rejected.');renderSection('py');}catch(e){showToast(e.message||'Reject failed.',true)}}
+
+    // Extend renderSection with the new management pages.
+    const originalRenderSection = renderSection;
+    renderSection = async function(id){
+      if(!['pl','py','ps','gm'].includes(id)){ return originalRenderSection(id); }
+      const c=document.getElementById('sa'); const titles={pl:'VIP PLANS',py:'PAYMENTS',ps:'PAYMENT SETTINGS',gm:'VIP GAMES'}; document.getElementById('pt').textContent=titles[id];
+      if(id==='pl'){
+        const snap=await db.collection('plans').orderBy('sort','asc').get();
+        c.innerHTML=`<div class="cd"><div class="ch"><h3><i class="fa-solid fa-tags"></i> VIP PLANS</h3></div><div style="padding:10px"><div class="fr"><input class="fi" id="planId" placeholder="ID (optional)"><input class="fi" id="planName" placeholder="Plan name"></div><div class="fr"><input class="fi" id="planPrice" type="number" placeholder="Price (NGN)"><input class="fi" id="planDays" type="number" value="7" placeholder="Duration days"></div><div class="fr"><input class="fi" id="planSort" type="number" value="1" placeholder="Sort"><label style="padding:12px"><input type="checkbox" id="planActive" checked> Active</label></div><button class="btn gd" onclick="savePlan()">SAVE PLAN</button></div></div>`+snap.docs.map(d=>{const p=d.data();return `<div class="cd"><div class="li"><div class="lf"><div class="lt">${p.name} — ₦${Number(p.price).toLocaleString()}</div><div class="lsb">${p.durationDays} days · ${p.active?'ACTIVE':'DISABLED'}</div></div><div class="la"><button class="btn ot" onclick="editPlan('${d.id}')"><i class="fa-solid fa-pen"></i></button><button class="btn rd" onclick="deletePlan('${d.id}')"><i class="fa-solid fa-trash"></i></button></div></div></div>`}).join('');
+      } else if(id==='ps'){
+        const s=(await db.collection('paymentSettings').doc('main').get()).data()||{}; const m=(await db.collection('manualPaymentSettings').doc('main').get()).data()||{};
+        c.innerHTML=`<div class="cd"><div class="ch"><h3>PAYMENT GATEWAY</h3></div><div style="padding:10px"><label>PROVIDER</label><select class="fi" id="payProvider"><option value="paystack" ${s.provider==='paystack'?'selected':''}>Paystack</option><option value="generic">Generic adapter</option></select><label>PUBLIC KEY</label><input class="fi" id="payPublic" value="${s.publicKey||''}"><label>CURRENCY</label><input class="fi" id="payCurrency" value="${s.currency||'NGN'}"><label>CALLBACK URL</label><input class="fi" id="payCallback" value="${s.callbackUrl||''}"><label>WEBHOOK URL</label><input class="fi" id="payWebhook" value="${s.webhookUrl||''}"><label>MODE</label><select class="fi" id="payMode"><option value="live">Live</option><option value="test">Test</option></select><p style="font-size:10px;color:#a0a0b8;margin:8px 0">Secret/API keys are server-side only. Do not paste secret keys into this page.</p><button class="btn gd" onclick="savePaymentSettings()">SAVE GATEWAY SETTINGS</button></div></div><div class="cd"><div class="ch"><h3>MANUAL PAYMENT DETAILS</h3></div><div style="padding:10px"><input class="fi" id="bankName" placeholder="Bank name" value="${m.bankName||''}"><input class="fi" id="accountName" placeholder="Account name" value="${m.accountName||''}"><input class="fi" id="accountNumber" placeholder="Account number" value="${m.accountNumber||''}"><textarea class="fi" id="manualNote" placeholder="Instructions">${m.note||''}</textarea><button class="btn gd" onclick="saveManualSettings()">SAVE MANUAL DETAILS</button></div></div>`;
+      } else if(id==='gm'){
+        const snap=await db.collection('vipGames').orderBy('createdAt','desc').limit(100).get();
+        c.innerHTML=`<div class="cd"><div class="ch"><h3>UPLOAD VIP GAME</h3></div><div style="padding:10px"><input class="fi" id="gameTitle" placeholder="Game title"><input class="fi" id="gameCode" placeholder="Game code"><textarea class="fi" id="gameDesc" placeholder="Description"></textarea><input class="fi" id="gameImage" type="file" accept="image/*"><button class="btn gd" onclick="uploadVipGame()">UPLOAD GAME</button></div></div>`+snap.docs.map(d=>{const g=d.data();return `<div class="cd"><div class="li"><div class="lf"><div class="lt">${g.title||'VIP GAME'}</div><div class="lsb">${g.code||''} · ${g.active?'ACTIVE':'HIDDEN'}</div></div><div class="la"><button class="btn ot" onclick="toggleGame('${d.id}',${!!g.active})">${g.active?'HIDE':'SHOW'}</button><button class="btn rd" onclick="deleteGame('${d.id}')"><i class="fa-solid fa-trash"></i></button></div></div></div>`}).join('');
+      } else if(id==='py'){
+        const docs=await loadManualPayments();
+        c.innerHTML='<div class="cd"><div class="ch"><h3>PAYMENTS & MANUAL REVIEWS</h3></div>'+docs.map(d=>{const p=d.data();return `<div class="li"><div class="lf"><div class="lt">${p.planName||p.planId} · ₦${Number(p.amount).toLocaleString()}</div><div class="lsb">${p.email||p.uid} · ${p.method} · ${p.status} · ${p.reference||''}</div>${p.proofPath?`<button class="btn ot" onclick="viewProof('${d.id}')">VIEW PROOF</button>`:''}</div><div class="la">${p.status==='pending_review'?`<button class="btn gd" onclick="approvePayment('${d.id}')">APPROVE</button><button class="btn rd" onclick="rejectPayment('${d.id}')">REJECT</button>`:''}</div></div>`}).join('')+'</div>';
+      }
+      c.scrollTop=0;
+    };
+  </script>
+</body>
+</html>
